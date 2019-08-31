@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1565883606 source:c:\users\pattr\onedrive - fundação edson queiroz - universidade de fortaleza\Área de trabalho\estrutura de dados\labirinto\main.cpp
+	<stdio.h>
+	<time.h>
+	<windows.h>
+	<cstdlib>
+	<stdlib.h>
+	<termios.h>
+	<unistd.h>
+	<fcntl.h>
+	<conio.h>
+	<iostream>
+
