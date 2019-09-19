@@ -2,38 +2,42 @@
 #include <stdlib.h>
 
 using namespace std;
-const int MAX = 1000;
-struct real{
-int esquerda=0;
-int direita=0;
+const int MAX = 10;
+struct RES{
+int quantidade;
+int resistencia;
 
 };
-
-struct PILHA{
-real numero[MAX];
-int tamanho;
-
+struct LISTA{
+    int topo;
+    RES resistor[MAX];
 };
-
-PILHA *contrutor(){
-PILHA *temp = (PILHA*)malloc(sizeof(PILHA));
-temp->tamanho=0;
+LISTA *construtor(){
+LISTA *temp =(LISTA*)malloc(sizeof(LISTA));
+temp ->topo=-1;
 return temp;
 }
-bool cheia(PILHA *temp);
-
-void add(PILHA *temp, int e, int d){
-
-
-
+bool Full(LISTA *temp){
+    if(temp->topo<MAX) return true;
+    return false;
 }
-void remover(){}
-void mostras(){}
-void buscar(){}
+bool Empty(LISTA *temp){
+if(temp->topo>=0) return true;
+    return false;
+}
+void setInicio(LISTA temp, int r, int q){}
+void setFim(LISTA temp, int r, int q){}
+void setPossicao(LISTA temp, int r, int q){}
+RES getFim(LISTA temp){}
+RES getInicio(LISTA temp){}
+RES getPossicao(LISTA temp, int p){}
+void buscar(LISTA temp,int r){}
+void mostrar(LISTA temp){}
+
 
 int main()
 {
-    PILHA *pilha= contrutor();
+    LISTA *lista= construtor();
 
     return 0;
 }
