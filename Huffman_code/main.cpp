@@ -11,6 +11,8 @@ char caracter;
 int frequencia;
 lno *anterior;
 lno *proximo;
+lno *direita;
+lno *esquerda;
 
 };
 struct lista{
@@ -37,42 +39,42 @@ bool buscar(lista *a, char c){
 return buscar_no(a->inicio,c);
     return false;
 }
-lno *criar_no(char c, int f, lno* an, lno* p){
+lno *criar_no(char c,int f,lno* an,lno* p,lno* e,lno* d){
     lno *a =(lno*)malloc(sizeof(lno));
     a->anterior=an;
     a->proximo=p;
     a->caracter=c;
     a->frequencia=f;
+    a->esquerda=e;
+    a->direita=d;
 
     return a;
 }
-void add(lno *a,int c,int f){
+void add(lno *a,lno *n){
     if(!a)
-        a=criar_no(c,f,criar_no_vazio(),criar_no_vazio());
-    else if(a->frequencia<f){
-        lno*  temp= criar_no(c,f,criar_no_vazio(),a);
-        a->anterior=temp;
-        a=temp;
+        a=n;
+    else if(a->frequencia<n->frequencia){
+        n->proximo=a;
+        a->anterior=n;
+        a=n;
 
     }
-    add(a->proximo,c,f);
+    add(a->proximo,n);
 
 
 }
-
-void add_em_ordem(lista *a,char c, int f){
+void add_em_ordem(lista *a, lno *n){
     if(!a->inicio)
-        a->inicio=criar_no(c,f,criar_no_vazio(),criar_no_vazio());
-    else if (a->inicio->frequencia>f){
-        lno*  temp= criar_no(c,f,criar_no_vazio(),a->inicio);
-        a->inicio->anterior=temp;
-        a->inicio=temp;
+        a->inicio=n;
+    else if (a->inicio->frequencia>n->frequencia){
+        n->proximo=a->inicio;
+        a->inicio->anterior=n;
+        a->inicio=n;
     }
     else
-        add(a->inicio,c,f);
+        add(a->inicio,n);
 
 }
-
 int quantidade(string s, char c){
     if (s[0]){
     char value[s.length()+1];
@@ -87,7 +89,6 @@ int quantidade(string s, char c){
     }
     return 0;
 }
-
 string receber_arquivo(string str){
     ifstream caminho_arquivo(str.c_str());
     string line,s;
@@ -105,7 +106,6 @@ string receber_arquivo(string str){
 
     return s;
 }
-
 void mostrar(lno *a){
 if(a){
     cout<<a->caracter<<" quantidade: "<<a->frequencia<<endl;
@@ -115,8 +115,9 @@ if(a){
 void mostrarlista(lista *a){
 mostrar(a->inicio);
 }
-
-
+void criar_arvore(lista *a){
+ //   arvore(a->inicio);
+}
 int main () {
 //string s =receber_arquivo("C:\\Users\\pattr\\OneDrive - Fundação Edson Queiroz - Universidade de Fortaleza\\Área de Trabalho\\projetos av3 estruturas.txt");
 string s =receber_arquivo("teste.txt");
@@ -128,10 +129,10 @@ char value[s.length()];
         cout<<value[i]<<endl;
 for(int i =0; i<sizeof(value)-1;i++){
         if(buscar(l,value[i])==false){
-            add_em_ordem(l,value[i],quantidade(s,value[i]));
-
+            add_em_ordem(l,criar_no(value[i],quantidade(s,value[i]),criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio()));
         }
 }
 mostrarlista(l);
+//criar_arvore(l);
   return 0;
 }
