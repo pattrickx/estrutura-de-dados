@@ -162,7 +162,44 @@ void novos_valores(lno *r,lista *l,string numero){
 
 
 }
+int busca_int(char c,lno *n){
+if(n){
+    if(n->caracter==c)
+        return n->frequencia;
+    busca_int(c,n->proximo);
+}
 
+}
+busca_char(int i, lno *n){
+if(n){
+    if(n->frequencia==i)
+        return n->caracter ;
+    busca_char(i,n->proximo);
+}
+}
+string novo_dado(string s,lista *novos){
+    string n="";
+    char value[s.length()];
+    strcpy(value, s.c_str());
+    for(int i =0; i<sizeof(value)-1;i++){
+
+        int num=busca_int(value[i],novos->inicio);
+        string bin="";
+        for (int i = 7; i >= 0; i--) {
+            if (num % 2 == 0) {
+                bin+= '0';
+                num = num / 2;
+            }
+            else {
+                bin+= '1';
+                num = num / 2;
+            }
+        }
+        n+=bin;
+
+}
+return n;
+}
 int main () {
 string s =receber_arquivo("C:\\Users\\pattr\\OneDrive - Fundação Edson Queiroz - Universidade de Fortaleza\\Área de Trabalho\\projetos av3 estruturas.txt");
 //string s =receber_arquivo("teste.txt");
@@ -187,6 +224,8 @@ lista *novos=criar_vazia();
 novos_valores(l->inicio,novos,"");
 cout<<"######################################### Lista de novos valores"<<endl;
 mostrarlista(novos);
+string n= novo_dado(s,novos);
+cout<<n<<endl;
 
   return 0;
 }
