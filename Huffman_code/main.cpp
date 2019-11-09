@@ -3,6 +3,7 @@
 #include <string>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 using namespace std;
 #include <bits/stdc++.h>
 struct lno{
@@ -105,16 +106,16 @@ string receber_arquivo(string str){
 
     return s;
 }
-void mostrar(lno *a,int i){
+void mostrar(lno *a){
 if(a){
-    cout<<"caractere: "<<a->caracter<<" quantidade: "<<a->frequencia<<" numero: "<<i++<<endl;
-    mostrar(a->proximo,i);
+    cout<<"caractere: "<<a->caracter<<" quantidade: "<<a->frequencia<<endl;
+    mostrar(a->proximo);
 
     }
 }
 void mostrarlista(lista *a){
     if(a->inicio)
-    mostrar(a->inicio,0);
+    mostrar(a->inicio);
 }
 void remover_primeiro(lista *a){
     if(!a->inicio->proximo)
@@ -126,15 +127,12 @@ void remover_primeiro(lista *a){
 
 }
 void criar_arvore(lista *a,int i){
-    //cout<<i<<endl;
     if(a->inicio->proximo){
 
         lno *temp=criar_no('+',a->inicio->frequencia+a->inicio->proximo->frequencia,criar_no_vazio(),criar_no_vazio(),a->inicio,a->inicio->proximo);
         remover_primeiro(a);
-        //cout<<"teste"<<endl;
         remover_primeiro(a);
         add_em_ordem(a,temp);
-       // mostrarlista(a);
         criar_arvore(a,++i);
     }
 }
@@ -146,6 +144,25 @@ void mostrar_arvore(lno *a){
     }
 
 }
+void novos_valores(lno *r,lista *l,string numero){
+       if(r){
+       if(!r->direita&&!r->esquerda){
+            int  novoValor = 0;
+            for (int i = numero.length()-1; i >= 0; i--)
+                if (numero[i] == '1')
+                    novoValor += pow(2,numero.length()-1-i);
+            lno *t=criar_no(r->caracter,novoValor,criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio());
+            add_em_ordem(l,t);
+       }
+       numero+='0';
+       novos_valores(r->esquerda,l,numero);
+       numero+='1';
+       novos_valores(r->direita,l,numero);
+       }
+
+
+}
+
 int main () {
 string s =receber_arquivo("C:\\Users\\pattr\\OneDrive - Fundação Edson Queiroz - Universidade de Fortaleza\\Área de Trabalho\\projetos av3 estruturas.txt");
 //string s =receber_arquivo("teste.txt");
@@ -161,8 +178,15 @@ for(int i =0; i<sizeof(value)-1;i++){
 
 }
 
-//mostrarlista(l);
+cout<<"######################################### Lista iniciar de caracteres e quantidades"<<endl;
+mostrarlista(l);
 criar_arvore(l,0);
+cout<<"######################################### Arvore de valores"<<endl;
 mostrar_arvore(l->inicio);
+lista *novos=criar_vazia();
+novos_valores(l->inicio,novos,"");
+cout<<"######################################### Lista de novos valores"<<endl;
+mostrarlista(novos);
+
   return 0;
 }
