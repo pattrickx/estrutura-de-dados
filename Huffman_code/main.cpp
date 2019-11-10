@@ -220,7 +220,7 @@ if(n){
     busca_char(i,n->proximo);
 }
 }
-string buscar_novo(char c,lno *n){
+char* buscar_novo(char c,lno *n){
 if(n){
     if(n->caracter==c)
         return n->novo_caracter ;
@@ -228,7 +228,7 @@ if(n){
 }
 
 }
-string int_bin(string s,lista *novos){
+string binario(string s,lista *novos){
     string n="";
     char value[s.length()];
     strcpy(value, s.c_str());
@@ -249,14 +249,14 @@ for(int i=0;i<novodado.length();i++){
         j++;
     }
     if(j==8){
-    //cout<<numero<<"  ";
+    //cout<<numero<<"->";
     for (int k = numero.length()-1 ; k >=0; k--) {
 		//printf("%c|", numero[i]);
 		if (numero[k] == '1') {
 			novoValor += pow(2,numero.length()-1-k);
 		}
 	}
-	//cout<<(char)(novoValor+'0')<<"  "<<novoValor<<"  ";
+	//cout<<(char)(novoValor)<<"->"<<novoValor<<"  ";
 
     codificado+=novoValor;
     novoValor=0;
@@ -267,29 +267,25 @@ for(int i=0;i<novodado.length();i++){
 
 return codificado;
 }
-/*
+
 string str_bin(string codificado){
  string decodificar="";
- for(int i=0;i<codificado.length()-1;i++){
+ for(int i=0;i<codificado.length();i++){
     int num = codificado[i];
-    string bin="";
-        for (int j = 0; j<8; j++) {
+    string bin="00000000";
+    cout<<codificado[i]<<"->"<<num<<"->";
+        for (int j = 7; j>=0; j--) {
             if (num % 2 == 0) {
-                bin+= '0';
+                bin[j]= '0';
                 num = num / 2;
             }
             else {
-                bin+= '1';
+                bin[j]= '1';
                 num = num / 2;
             }
         }
-        cout<<bin<<"->";
-        string aux="";
-        for (int j=7; j>=0; j--)
-            aux += bin[j];
-
-         cout<<aux<<"  ";
-        decodificar+=aux;
+    cout<<bin<<" ";
+    decodificar+=bin;
 
  }
  return decodificar;
@@ -313,7 +309,7 @@ if(decodificar[i]=='1'&& a->direita)
 
 }
 }
-*/
+
 int main () {
 //string s =receber_arquivo("C:\\Users\\pattr\\OneDrive - Fundação Edson Queiroz - Universidade de Fortaleza\\Área de Trabalho\\projetos av3 estruturas.txt");
 string s =receber_arquivo("teste.txt");
@@ -330,11 +326,12 @@ lista *novos=criar_vazia();
 novos_valores(l->inicio,novos,"");
 cout<<"######################################### Lista de novos valores"<<endl;
 mostrarlista(novos);
-string novodado= int_bin(s,novos);
+cout<<"######################################### Novo dado"<<endl;
+string novodado= binario(s,novos);
 cout<<novodado<<endl<<endl<<endl;
 
 string codificado=codificador(novodado);
-
+cout<<"#########################################Codificado"<<endl;
 
 cout<<codificado<<endl;
 
@@ -344,11 +341,12 @@ ofstream out("codificado.txt");
 
 
 ///////////////////////////////////////////////////////////
-/*
-cout<<endl;
+
+cout<<"#########################################Binario re feito"<<endl;
 string decodificar=str_bin(codificado);
 
 cout<<decodificar<<endl;
+/*
 string decodificado=decodificador(decodificar,l->inicio,l->inicio,0,"");
 cout<<decodificado<<endl;
 
