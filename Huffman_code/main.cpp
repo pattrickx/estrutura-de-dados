@@ -10,6 +10,7 @@ struct lno{
 
 char caracter;
 int frequencia;
+char *novo_caracter;
 lno *anterior;
 lno *proximo;
 lno *direita;
@@ -39,7 +40,7 @@ bool buscar(lista *a, char c){
 return buscar_no(a->inicio,c);
 
 }
-lno *criar_no(char c,int f,lno* an,lno* p,lno* e,lno* d){
+lno *criar_no(char c,char *no,int f,lno* an,lno* p,lno* e,lno* d){
     lno *a =(lno*)malloc(sizeof(lno));
     a->anterior=an;
     a->proximo=p;
@@ -47,6 +48,8 @@ lno *criar_no(char c,int f,lno* an,lno* p,lno* e,lno* d){
     a->frequencia=f;
     a->esquerda=e;
     a->direita=d;
+    a->novo_caracter= (char*)malloc(sizeof(char)*(strlen(no)+1));
+    strcpy(a->novo_caracter, no);
 
     return a;
 }
@@ -121,7 +124,7 @@ char value[s.length()];
     strcpy(value, s.c_str());
 for(int i =0; i<sizeof(value)-1;i++){
         if(!buscar(l,value[i])){
-            lno *t=criar_no(value[i],quantidade(s,value[i]),criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio());
+            lno *t=criar_no(value[i],"00000000",quantidade(s,value[i]),criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio());
             cout<<t->caracter <<"  "<<t->frequencia<<endl;
             add_em_ordem(l,t);
             }
@@ -134,7 +137,7 @@ return l;
 
 void mostrar(lno *a){
 if(a){
-    cout<<"caractere: "<<a->caracter<<" quantidade: "<<a->frequencia<<endl;
+    cout<<"caractere: "<<a->caracter<<" novo_caracter: "<<a->novo_caracter<<" quantidade: "<<a->frequencia<<endl;
     mostrar(a->proximo);
     }
 }
@@ -154,7 +157,7 @@ void remover_primeiro(lista *a){
 void criar_arvore(lista *a,int i){
     if(a->inicio->proximo){
 
-        lno *temp=criar_no('+',a->inicio->frequencia+a->inicio->proximo->frequencia,criar_no_vazio(),criar_no_vazio(),a->inicio,a->inicio->proximo);
+        lno *temp=criar_no('+',"+",a->inicio->frequencia+a->inicio->proximo->frequencia,criar_no_vazio(),criar_no_vazio(),a->inicio,a->inicio->proximo);
         remover_primeiro(a);
         remover_primeiro(a);
         add_em_ordem(a,temp);
@@ -166,28 +169,38 @@ void mostrar_arvore(lno *a,string s){
         if(!a->esquerda&& !a->direita){
         cout<<s<<"  caractere: "<<a->caracter<<" quantidade: "<<a->frequencia<<endl;
         }
-        s+="0";
+        if(a->esquerda){
+        s+='0';
         mostrar_arvore(a->esquerda,s);
-        s+="1";
-        mostrar_arvore(a->direita,s);
-
+        }
+        if(a->esquerda){
+            s+='1';
+            mostrar_arvore(a->direita,s);
+        }
     }
 
 }
 void novos_valores(lno *r,lista *l,string numero){
        if(r){
+
+        if(r->esquerda){
+            numero+='0';
+            novos_valores(r->esquerda,l,numero);
+        }
+        if(r->esquerda){
+            numero+='1';
+            novos_valores(r->direita,l,numero);
+        }
+
+
        if(!r->direita&&!r->esquerda){
-            int  novoValor = 0;
-            for (int i = numero.length()-1; i >=0 ; i--)
-                if (numero[i] == '1')
-                    novoValor += pow(2,numero.length()-1-i);
-            lno *t=criar_no(r->caracter,novoValor,criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio());
+            char value[numero.length()+1];
+            strcpy(value, numero.c_str());
+
+            lno *t=criar_no(r->caracter,value,0,criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio());
+            cout<<"caractere: "<<t->caracter<<" novo_caracter: "<<t->novo_caracter<<" quantidade: "<<t->frequencia<<endl;
             add_em_ordem(l,t);
        }
-       numero+='0';
-       novos_valores(r->esquerda,l,numero);
-       numero+='1';
-       novos_valores(r->direita,l,numero);
        }
 
 
@@ -200,34 +213,27 @@ if(n){
 }
 
 }
-busca_char(int i, lno *n){
+char busca_char(int i, lno *n){
 if(n){
     if(n->frequencia==i)
         return n->caracter ;
     busca_char(i,n->proximo);
 }
 }
+string buscar_novo(char c,lno *n){
+if(n){
+    if(n->caracter==c)
+        return n->novo_caracter ;
+    buscar_novo(c,n->proximo);
+}
+
+}
 string int_bin(string s,lista *novos){
     string n="";
     char value[s.length()];
     strcpy(value, s.c_str());
-    for(int i =0; i<sizeof(value);i++){
-
-        int num=busca_int(value[i],novos->inicio);
-        string bin="";
-        for (int i = 0; i<8; i++) {
-            if (num % 2 == 0) {
-                bin+= '0';
-                num = num / 2;
-            }
-            else {
-                bin+= '1';
-                num = num / 2;
-            }
-        }
-        n+=bin;
-
-}
+    for(int i =0; i<sizeof(value);i++)
+         n+=buscar_novo(value[i],novos->inicio);
 return n;
 }
 string codificador(string novodado){
