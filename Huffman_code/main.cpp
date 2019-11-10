@@ -51,15 +51,19 @@ lno *criar_no(char c,int f,lno* an,lno* p,lno* e,lno* d){
     return a;
 }
 void add(lno *a,lno *n){
-    if(!a->proximo){
+
+    if(a->frequencia>n->frequencia){
+        n->proximo=a;
+        n->anterior=a->anterior;
+        a->anterior->proximo=n;
+        a->anterior=n;
+
+
+    }else if(!a->proximo){
         a->proximo=n;
         n->anterior=a;
         }
-    else if(a->frequencia>n->frequencia){
-        n->proximo=a->proximo;
-        a->proximo=n;
-        n->anterior=a;
-    }else add(a->proximo,n);
+    else add(a->proximo,n);
 
 
 }
@@ -68,11 +72,16 @@ void add_em_ordem(lista *a, lno *n){
     if(!a->inicio)
         a->inicio=n;
     else if (a->inicio->frequencia>n->frequencia){
+
         n->proximo=a->inicio;
         a->inicio->anterior=n;
         a->inicio=n;
     }
-    else add(a->inicio,n);
+    else if(!a->inicio->proximo){
+        a->inicio->proximo=n;
+            n->anterior=a->inicio;
+    }
+    else add(a->inicio->proximo,n);
 
 }
 int quantidade(string s, char c){
@@ -106,11 +115,27 @@ string receber_arquivo(string str){
 
     return s;
 }
+lista *criar_lista_frequencia(string s){
+    lista* l=criar_vazia();
+char value[s.length()];
+    strcpy(value, s.c_str());
+for(int i =0; i<sizeof(value)-1;i++){
+        if(!buscar(l,value[i])){
+            lno *t=criar_no(value[i],quantidade(s,value[i]),criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio());
+            cout<<t->caracter <<"  "<<t->frequencia<<endl;
+            add_em_ordem(l,t);
+            }
+
+}
+return l;
+
+}
+
+
 void mostrar(lno *a){
 if(a){
     cout<<"caractere: "<<a->caracter<<" quantidade: "<<a->frequencia<<endl;
     mostrar(a->proximo);
-
     }
 }
 void mostrarlista(lista *a){
@@ -136,11 +161,16 @@ void criar_arvore(lista *a,int i){
         criar_arvore(a,++i);
     }
 }
-void mostrar_arvore(lno *a){
+void mostrar_arvore(lno *a,string s){
     if(a){
-        cout<<"caractere: "<<a->caracter<<" quantidade: "<<a->frequencia<<endl;
-        mostrar_arvore(a->esquerda);
-        mostrar_arvore(a->direita);
+        if(!a->esquerda&& !a->direita){
+        cout<<s<<"  caractere: "<<a->caracter<<" quantidade: "<<a->frequencia<<endl;
+        }
+        s+="0";
+        mostrar_arvore(a->esquerda,s);
+        s+="1";
+        mostrar_arvore(a->direita,s);
+
     }
 
 }
@@ -148,7 +178,7 @@ void novos_valores(lno *r,lista *l,string numero){
        if(r){
        if(!r->direita&&!r->esquerda){
             int  novoValor = 0;
-            for (int i = numero.length()-1; i >= 0; i--)
+            for (int i = numero.length()-1; i >=0 ; i--)
                 if (numero[i] == '1')
                     novoValor += pow(2,numero.length()-1-i);
             lno *t=criar_no(r->caracter,novoValor,criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio());
@@ -177,15 +207,15 @@ if(n){
     busca_char(i,n->proximo);
 }
 }
-string novo_dado(string s,lista *novos){
+string int_bin(string s,lista *novos){
     string n="";
     char value[s.length()];
     strcpy(value, s.c_str());
-    for(int i =0; i<sizeof(value)-1;i++){
+    for(int i =0; i<sizeof(value);i++){
 
         int num=busca_int(value[i],novos->inicio);
         string bin="";
-        for (int i = 7; i >= 0; i--) {
+        for (int i = 0; i<8; i++) {
             if (num % 2 == 0) {
                 bin+= '0';
                 num = num / 2;
@@ -214,7 +244,7 @@ for(int i=0;i<novodado.length();i++){
     }
     if(j==8){
     //cout<<numero<<"  ";
-    for (int k = numero.length()-1 ; k >= 0; k--) {
+    for (int k = numero.length()-1 ; k >=0; k--) {
 		//printf("%c|", numero[i]);
 		if (numero[k] == '1') {
 			novoValor += pow(2,numero.length()-1-k);
@@ -231,32 +261,70 @@ for(int i=0;i<novodado.length();i++){
 
 return codificado;
 }
-
-int main () {
-string s =receber_arquivo("C:\\Users\\pattr\\OneDrive - Fundação Edson Queiroz - Universidade de Fortaleza\\Área de Trabalho\\projetos av3 estruturas.txt");
-//string s =receber_arquivo("teste.txt");
-lista *l=criar_vazia();
-cout<<s;
-char value[s.length()];
-    strcpy(value, s.c_str());
-for(int i =0; i<sizeof(value)-1;i++){
-        if(!buscar(l,value[i])){
-            lno *t=criar_no(value[i],quantidade(s,value[i]),criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio());
-            add_em_ordem(l,t);
+/*
+string str_bin(string codificado){
+ string decodificar="";
+ for(int i=0;i<codificado.length()-1;i++){
+    int num = codificado[i];
+    string bin="";
+        for (int j = 0; j<8; j++) {
+            if (num % 2 == 0) {
+                bin+= '0';
+                num = num / 2;
             }
+            else {
+                bin+= '1';
+                num = num / 2;
+            }
+        }
+        cout<<bin<<"->";
+        string aux="";
+        for (int j=7; j>=0; j--)
+            aux += bin[j];
+
+         cout<<aux<<"  ";
+        decodificar+=aux;
+
+ }
+ return decodificar;
+}
+
+string decodificador(string decodificar,lno * raiz ,lno * a,int i,string decodificado){
+if(a){
+
+if(!a->direita&& !a->esquerda){
+    decodificado += a->caracter;
+   cout<<a->caracter;
+    decodificador(decodificar,raiz,raiz,++i,decodificado);
+    }
+
+if(i==decodificar.length()-1)
+    return decodificado;
+if(decodificar[i]=='0'&& a->esquerda)
+    decodificador(decodificar,raiz,a->esquerda,++i,decodificado);
+if(decodificar[i]=='1'&& a->direita)
+    decodificador(decodificar,raiz,a->direita,++i,decodificado);
 
 }
+}
+*/
+int main () {
+//string s =receber_arquivo("C:\\Users\\pattr\\OneDrive - Fundação Edson Queiroz - Universidade de Fortaleza\\Área de Trabalho\\projetos av3 estruturas.txt");
+string s =receber_arquivo("teste.txt");
+lista *l=criar_vazia();
+cout<<s;
+l=criar_lista_frequencia(s);
 
 cout<<"######################################### Lista iniciar de caracteres e quantidades"<<endl;
 mostrarlista(l);
 criar_arvore(l,0);
 cout<<"######################################### Arvore de valores"<<endl;
-mostrar_arvore(l->inicio);
+mostrar_arvore(l->inicio,"");
 lista *novos=criar_vazia();
 novos_valores(l->inicio,novos,"");
 cout<<"######################################### Lista de novos valores"<<endl;
 mostrarlista(novos);
-string novodado= novo_dado(s,novos);
+string novodado= int_bin(s,novos);
 cout<<novodado<<endl<<endl<<endl;
 
 string codificado=codificador(novodado);
@@ -269,5 +337,18 @@ ofstream out("codificado.txt");
     out.close();
 
 
+///////////////////////////////////////////////////////////
+/*
+cout<<endl;
+string decodificar=str_bin(codificado);
+
+cout<<decodificar<<endl;
+string decodificado=decodificador(decodificar,l->inicio,l->inicio,0,"");
+cout<<decodificado<<endl;
+
+ofstream out1("decodificado.txt");
+    out1 << decodificado;
+    out1.close();
+*/
   return 0;
 }
