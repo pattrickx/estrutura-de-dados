@@ -200,6 +200,38 @@ string novo_dado(string s,lista *novos){
 }
 return n;
 }
+string codificador(string novodado){
+string codificado="";
+string numero="";
+int j=0;
+int novoValor=0;
+
+for(int i=0;i<novodado.length();i++){
+
+    if(j<8){
+        numero+=novodado[i];
+        j++;
+    }
+    if(j==8){
+    //cout<<numero<<"  ";
+    for (int k = numero.length()-1 ; k >= 0; k--) {
+		//printf("%c|", numero[i]);
+		if (numero[k] == '1') {
+			novoValor += pow(2,numero.length()-1-k);
+		}
+	}
+	//cout<<(char)(novoValor+'0')<<"  "<<novoValor<<"  ";
+
+    codificado+=novoValor;
+    novoValor=0;
+    numero="";
+    j=0;
+    }
+}
+
+return codificado;
+}
+
 int main () {
 string s =receber_arquivo("C:\\Users\\pattr\\OneDrive - Fundação Edson Queiroz - Universidade de Fortaleza\\Área de Trabalho\\projetos av3 estruturas.txt");
 //string s =receber_arquivo("teste.txt");
@@ -224,8 +256,18 @@ lista *novos=criar_vazia();
 novos_valores(l->inicio,novos,"");
 cout<<"######################################### Lista de novos valores"<<endl;
 mostrarlista(novos);
-string n= novo_dado(s,novos);
-cout<<n<<endl;
+string novodado= novo_dado(s,novos);
+cout<<novodado<<endl<<endl<<endl;
+
+string codificado=codificador(novodado);
+
+
+cout<<codificado<<endl;
+
+ofstream out("codificado.txt");
+    out << codificado;
+    out.close();
+
 
   return 0;
 }

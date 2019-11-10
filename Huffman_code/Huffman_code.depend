@@ -1,9 +1,10 @@
 # depslib dependency file v1.0
-1573331340 source:c:\users\pattr\onedrive - fundação edson queiroz - universidade de fortaleza\Área de trabalho\sexto semestre\estrutura-de-dados\huffman_code\main.cpp
+1573351075 source:c:\users\pattr\onedrive - fundação edson queiroz - universidade de fortaleza\Área de trabalho\sexto semestre\estrutura-de-dados\huffman_code\main.cpp
 	<iostream>
 	<fstream>
 	<string>
 	<stdlib.h>
 	<stdio.h>
+	<math.h>
 	<bits/stdc++.h>
 
