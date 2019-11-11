@@ -180,45 +180,38 @@ void mostrar_arvore(lno *a,string s){
     }
 
 }
+string remove_ultimo(string numero){
+    if(numero.length()>0){
+            string aux= numero;
+            numero="";
+            for(int i=0;i<aux.length()-2;i++)
+            numero+=aux[i];
+            return numero;
+        }
+
+}
 void novos_valores(lno *r,lista *l,string numero){
-       if(r){
+    if(r){
 
-        if(r->esquerda){
-            numero+='0';
-            novos_valores(r->esquerda,l,numero);
-        }
-        if(r->esquerda){
-            numero+='1';
-            novos_valores(r->direita,l,numero);
-        }
-
-
-       if(!r->direita&&!r->esquerda){
+            if(!r->direita&&!r->esquerda){
+                   // numero=remove_primeiro(numero);
             char value[numero.length()+1];
             strcpy(value, numero.c_str());
-
             lno *t=criar_no(r->caracter,value,0,criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio());
-            cout<<"caractere: "<<t->caracter<<" novo_caracter: "<<t->novo_caracter<<" quantidade: "<<t->frequencia<<endl;
             add_em_ordem(l,t);
-       }
-       }
 
 
-}
-int busca_int(char c,lno *n){
-if(n){
-    if(n->caracter==c)
-        return n->frequencia;
-    busca_int(c,n->proximo);
-}
+            }else{
 
-}
-char busca_char(int i, lno *n){
-if(n){
-    if(n->frequencia==i)
-        return n->caracter ;
-    busca_char(i,n->proximo);
-}
+            string numero2=numero+'0';
+            novos_valores(r->esquerda,l,numero2);
+            string numero3=numero+'1';
+            novos_valores(r->direita,l,numero3);
+            }
+
+    }
+
+
 }
 char* buscar_novo(char c,lno *n){
 if(n){
@@ -267,13 +260,12 @@ for(int i=0;i<novodado.length();i++){
 
 return codificado;
 }
-
 string str_bin(string codificado){
  string decodificar="";
  for(int i=0;i<codificado.length();i++){
     int num = codificado[i];
     string bin="00000000";
-    cout<<codificado[i]<<"->"<<num<<"->";
+    //cout<<codificado[i]<<"->"<<num<<"->";
         for (int j = 7; j>=0; j--) {
             if (num % 2 == 0) {
                 bin[j]= '0';
@@ -284,7 +276,7 @@ string str_bin(string codificado){
                 num = num / 2;
             }
         }
-    cout<<bin<<" ";
+    //cout<<bin<<" ";
     decodificar+=bin;
 
  }
@@ -292,24 +284,23 @@ string str_bin(string codificado){
 }
 
 string decodificador(string decodificar,lno * raiz ,lno * a,int i,string decodificado){
-if(a){
+    if(a){
 
-if(!a->direita&& !a->esquerda){
-    decodificado += a->caracter;
-   cout<<a->caracter;
-    decodificador(decodificar,raiz,raiz,++i,decodificado);
+
+        if(decodificar[i]=='0'&& a->esquerda)
+            decodificador(decodificar,raiz,a->esquerda,++i,decodificado);
+
+        if(decodificar[i]=='1'&& a->direita)
+            decodificador(decodificar,raiz,a->direita,++i,decodificado);
+            if(!a->direita && !a->esquerda){
+            decodificado += a->caracter;
+            decodificador(decodificar,raiz,raiz,++i,decodificado);
+            }
+            if(i==decodificar.length()-1)
+            return decodificado;
+
     }
-
-if(i==decodificar.length()-1)
-    return decodificado;
-if(decodificar[i]=='0'&& a->esquerda)
-    decodificador(decodificar,raiz,a->esquerda,++i,decodificado);
-if(decodificar[i]=='1'&& a->direita)
-    decodificador(decodificar,raiz,a->direita,++i,decodificado);
-
 }
-}
-
 int main () {
 //string s =receber_arquivo("C:\\Users\\pattr\\OneDrive - Fundação Edson Queiroz - Universidade de Fortaleza\\Área de Trabalho\\projetos av3 estruturas.txt");
 string s =receber_arquivo("teste.txt");
@@ -328,8 +319,7 @@ cout<<"######################################### Lista de novos valores"<<endl;
 mostrarlista(novos);
 cout<<"######################################### Novo dado"<<endl;
 string novodado= binario(s,novos);
-cout<<novodado<<endl<<endl<<endl;
-
+cout<<novodado<<endl;
 string codificado=codificador(novodado);
 cout<<"#########################################Codificado"<<endl;
 
@@ -346,13 +336,13 @@ cout<<"#########################################Binario re feito"<<endl;
 string decodificar=str_bin(codificado);
 
 cout<<decodificar<<endl;
-/*
+
 string decodificado=decodificador(decodificar,l->inicio,l->inicio,0,"");
 cout<<decodificado<<endl;
 
 ofstream out1("decodificado.txt");
     out1 << decodificado;
     out1.close();
-*/
+
   return 0;
 }
