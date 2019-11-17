@@ -114,9 +114,10 @@ string receber_arquivo(string str){
         caminho_arquivo.close();
       }
       else cout << "Unable to open file";
-
-
-    return s;
+    string t="";
+    for(int i=0;i<s.length()-1;i++)
+        t+=s[i];
+    return t;
 }
 lista *criar_lista_frequencia(string s){
     lista* l=criar_vazia();
@@ -216,11 +217,11 @@ string codificador(string novodado){
 string codificado="";
 string numero="";
 int j=0;
-int novoValor=0;
+
 if(novodado.length()%8!=0)
     for(int i= 0;i<(novodado.length()%8);i++)
         novodado+='0';
-        //cout<<novodado<<endl;
+cout<<novodado<<endl;
 for(int i=0;i<novodado.length();i++){
 
     if(j<8){
@@ -228,15 +229,16 @@ for(int i=0;i<novodado.length();i++){
         j++;
     }
     if(j==8){
-        for (int k = numero.length()-1 ; k >=0; k--) {
-            if (numero[k] == '1') {
-                novoValor += pow(2,numero.length()-1-k);
-            }
-	}
-    codificado+=novoValor;
-    novoValor=0;
-    numero="";
-    j=0;
+        cout<<numero<<endl;
+        int novoValor=0;
+        int l=0;
+        for (int k = 7 ; k >=0; k--)
+                novoValor += pow(2, l++) * (numero[k] - '0');
+        cout<< novoValor<<endl;
+        codificado+=novoValor;
+
+        numero="";
+        j=0;
     }
 }
 
@@ -245,9 +247,9 @@ return codificado;
 string str_bin(string codificado){
  string decodificar="";
  for(int i=0;i<codificado.length();i++){
-    int num = codificado[i];
+    int num = codificado[i]+256;
     string bin="00000000";
-    //cout<<codificado[i]<<"->"<<num<<"->";
+    cout<<codificado[i]<<"->"<<num<<"->";
         for (int j = 7; j>=0; j--) {
             if (num % 2 == 0) {
                 bin[j]= '0';
@@ -258,25 +260,11 @@ string str_bin(string codificado){
                 num = num / 2;
             }
         }
-       // cout<<bin<<endl;
+        cout<<bin<<endl;
     decodificar+=bin;
 
  }
  return decodificar;
-}
-string decodificador(string decodificar,lno * raiz ,lno * a,int i,string decodificado){
-    if(a){
-        if(decodificar[i]=='0'&& a->esquerda)
-            decodificador(decodificar,raiz,a->esquerda,++i,decodificado);
-        if(decodificar[i]=='1'&& a->direita)
-            decodificador(decodificar,raiz,a->direita,++i,decodificado);
-        if(!a->direita && !a->esquerda){
-            decodificado += a->caracter;
-            decodificador(decodificar,raiz,raiz,++i,decodificado);
-        }
-        if(i==decodificar.length()-2)
-            return decodificado;
-    }
 }
 string int_bin_protobuf(int num){
     string bin="";
@@ -321,21 +309,6 @@ int bin_protobuf_int(string n){
     }
     return dec;
 }
-void add_f_lista(lno* l, lno* n){
-    if(!l->proximo){
-        n->anterior=l;
-        l->proximo=n;
-    }
-    else
-        add_f_lista(l->proximo, n);
-}
-void add_fim_lista(lista *l, lno* n){
-    if(!l->inicio)
-        l->inicio=n;
-    else
-        add_f_lista(l->inicio, n);
-
-}
 lista* ler_dicionario(string d){
     lista * l=criar_vazia();
     int n=0;
@@ -352,8 +325,6 @@ lista* ler_dicionario(string d){
         k++;
     }
     num+=bin_protobuf_int(bin);
-    cout<<n<<endl;
-    cout<<num<<endl;
     for(int i =n+1; i<=num;i++){
         int x=i;
         y="";
@@ -369,12 +340,74 @@ lista* ler_dicionario(string d){
             j++;
         }
         numero+=bin_protobuf_int(bin);
-        cout<<d[i]<<" -> "<<numero<<endl;
         add_em_ordem(l,criar_no(d[i],"00000000",numero,criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio()));
         i=x;
 
     }
     return l;
+}
+string ler_arquivo(string d){
+
+    int n=0;
+    string y="";
+    y+=d[n];
+    string bin = str_bin(y);
+    int k=0;
+    int num=0;
+    while(bin[k]=='1'){
+        num+=bin_protobuf_int(bin);
+        y="";
+        y+=d[++n];
+        bin=str_bin(y);
+        k++;
+    }
+    num+=bin_protobuf_int(bin);
+    cout<<n<<endl;
+    n+=num+1;
+    y="";
+    y+=d[n];
+    cout<<y<<endl;
+    bin = str_bin(y);
+    k=0;
+    num=0;
+    while(bin[k]=='1'){
+        num+=bin_protobuf_int(bin);
+        y="";
+        y+=d[++n];
+        bin=str_bin(y);
+        k++;
+    }
+    num+=bin_protobuf_int(bin);
+
+    string decodificar="";
+    string binario="";
+    cout<<"inicio: "<<n+1<<endl;
+    cout<<"fim: "<<n+1+num<<endl;
+    cout<<"binario total"<<str_bin(d)<<endl;
+    for(int i =n+1; i<d.length();i++){
+        binario+=d[i];
+     }
+     cout<<"antes do binario: "<<binario<<endl;
+     binario=str_bin(binario);
+     cout<<"depois do binario: "<<binario<<endl;
+     for(int i=0; i<num;i++){
+        decodificar+=binario[i];
+     }
+
+     return decodificar;
+
+}
+string decodificador(string decodificar,lno * raiz ,lno * a,int i,string decodificado){
+    if(a){
+        if(!a->direita && !a->esquerda)
+            return a->caracter+decodificador(decodificar,raiz,raiz,i,decodificado);
+        if(decodificar[i]=='0')
+            return decodificado+decodificador(decodificar,raiz,a->esquerda,i+1,"");
+        if(decodificar[i]=='1')
+            return decodificado+decodificador(decodificar,raiz,a->direita,i+1,"");
+
+    }
+    return "";
 }
 int main(){
 string s =receber_arquivo("teste.txt");
@@ -400,7 +433,7 @@ string tamanho_dicionario=codificador(int_bin_protobuf(dicionario.length()));
 string tamanho_arquivo_bin=codificador(int_bin_protobuf(novodado.length()));
 string dicionario_completo=tamanho_dicionario+dicionario+tamanho_arquivo_bin;
 cout<<"dicionario_completo: "<<dicionario_completo<<endl;
-
+cout<<"tamanho do dado: "<<novodado.length()<<endl;
 
 cout<<"######################################### Codificado"<<endl;
 string codificado=codificador(novodado);
@@ -421,12 +454,11 @@ criar_arvore(dici,0);
 mostrar_arvore(dici->inicio,"");
 
 cout<<"######################################### Binario re feito"<<endl;
-string decodificar=str_bin(codificado);
-
+string decodificar=ler_arquivo(codificado);
 cout<<decodificar<<endl;
 cout<<"######################################### Decodificado"<<endl;
 string decodificado=decodificador(decodificar,l->inicio,l->inicio,0,"");
-cout<<decodificado<<endl;
+cout<<decodificado;
 
 ofstream out1("decodificado.txt");
     out1 << decodificado;
