@@ -305,7 +305,7 @@ return bin;
 }
 string salvar_lista(lno *a){
 if(a){
-    return salvar_lista(a->proximo)+a->caracter+codificador(int_bin_protobuf(a->frequencia));
+    return a->caracter+codificador(int_bin_protobuf(a->frequencia))+salvar_lista(a->proximo);
 }
 return "";
 
@@ -320,6 +320,21 @@ int bin_protobuf_int(string n){
             i=n.length();
     }
     return dec;
+}
+void add_f_lista(lno* l, lno* n){
+    if(!l->proximo){
+        n->anterior=l;
+        l->proximo=n;
+    }
+    else
+        add_f_lista(l->proximo, n);
+}
+void add_fim_lista(lista *l, lno* n){
+    if(!l->inicio)
+        l->inicio=n;
+    else
+        add_f_lista(l->inicio, n);
+
 }
 lista* ler_dicionario(string d){
     lista * l=criar_vazia();
@@ -337,7 +352,9 @@ lista* ler_dicionario(string d){
         k++;
     }
     num+=bin_protobuf_int(bin);
-    for(int i =n; i<=num;i++){
+    cout<<n<<endl;
+    cout<<num<<endl;
+    for(int i =n+1; i<=num;i++){
         int x=i;
         y="";
         y+=d[++x];
@@ -352,10 +369,12 @@ lista* ler_dicionario(string d){
             j++;
         }
         numero+=bin_protobuf_int(bin);
-        add_em_ordem(l,criar_no(d[i],"",numero,criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio()));
+        cout<<d[i]<<" -> "<<numero<<endl;
+        add_em_ordem(l,criar_no(d[i],"00000000",numero,criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio()));
         i=x;
 
     }
+    return l;
 }
 int main(){
 string s =receber_arquivo("teste.txt");
