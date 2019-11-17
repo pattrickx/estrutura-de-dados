@@ -133,8 +133,6 @@ for(int i =0; i<sizeof(value)-1;i++){
 return l;
 
 }
-
-
 void mostrar(lno *a){
 if(a){
     cout<<"caractere: "<<a->caracter<<" novo_caracter: "<<a->novo_caracter<<" quantidade: "<<a->frequencia<<endl;
@@ -166,17 +164,10 @@ void criar_arvore(lista *a,int i){
 }
 void mostrar_arvore(lno *a,string s){
     if(a){
-        if(!a->esquerda&& !a->direita){
+        //if(!a->esquerda&& !a->direita)
+        mostrar_arvore(a->esquerda,s+'0');
+        mostrar_arvore(a->direita,s+'1');
         cout<<s<<"  caractere: "<<a->caracter<<" quantidade: "<<a->frequencia<<endl;
-        }
-        if(a->esquerda){
-        s+='0';
-        mostrar_arvore(a->esquerda,s);
-        }
-        if(a->esquerda){
-            s+='1';
-            mostrar_arvore(a->direita,s);
-        }
     }
 
 }
@@ -194,20 +185,13 @@ void novos_valores(lno *r,lista *l,string numero){
     if(r){
 
             if(!r->direita&&!r->esquerda){
-                   // numero=remove_primeiro(numero);
-            char value[numero.length()+1];
-            strcpy(value, numero.c_str());
-            lno *t=criar_no(r->caracter,value,0,criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio());
-            add_em_ordem(l,t);
-
-
-            }else{
-
-            string numero2=numero+'0';
-            novos_valores(r->esquerda,l,numero2);
-            string numero3=numero+'1';
-            novos_valores(r->direita,l,numero3);
+                char value[numero.length()+1];
+                strcpy(value, numero.c_str());
+                lno *t=criar_no(r->caracter,value,0,criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio());
+                add_em_ordem(l,t);
             }
+            novos_valores(r->esquerda,l,numero+'0');
+            novos_valores(r->direita,l,numero+'1');
 
     }
 
@@ -219,7 +203,6 @@ if(n){
         return n->novo_caracter ;
     buscar_novo(c,n->proximo);
 }
-
 }
 string binario(string s,lista *novos){
     string n="";
@@ -234,7 +217,10 @@ string codificado="";
 string numero="";
 int j=0;
 int novoValor=0;
-
+if(novodado.length()%8!=0)
+    for(int i= 0;i<(novodado.length()%8);i++)
+        novodado+='0';
+        //cout<<novodado<<endl;
 for(int i=0;i<novodado.length();i++){
 
     if(j<8){
@@ -242,15 +228,11 @@ for(int i=0;i<novodado.length();i++){
         j++;
     }
     if(j==8){
-    //cout<<numero<<"->";
-    for (int k = numero.length()-1 ; k >=0; k--) {
-		//printf("%c|", numero[i]);
-		if (numero[k] == '1') {
-			novoValor += pow(2,numero.length()-1-k);
-		}
+        for (int k = numero.length()-1 ; k >=0; k--) {
+            if (numero[k] == '1') {
+                novoValor += pow(2,numero.length()-1-k);
+            }
 	}
-	//cout<<(char)(novoValor)<<"->"<<novoValor<<"  ";
-
     codificado+=novoValor;
     novoValor=0;
     numero="";
@@ -276,38 +258,111 @@ string str_bin(string codificado){
                 num = num / 2;
             }
         }
-    //cout<<bin<<" ";
+       // cout<<bin<<endl;
     decodificar+=bin;
 
  }
  return decodificar;
 }
-
 string decodificador(string decodificar,lno * raiz ,lno * a,int i,string decodificado){
     if(a){
-
-
         if(decodificar[i]=='0'&& a->esquerda)
             decodificador(decodificar,raiz,a->esquerda,++i,decodificado);
-
         if(decodificar[i]=='1'&& a->direita)
             decodificador(decodificar,raiz,a->direita,++i,decodificado);
-            if(!a->direita && !a->esquerda){
+        if(!a->direita && !a->esquerda){
             decodificado += a->caracter;
             decodificador(decodificar,raiz,raiz,++i,decodificado);
-            }
-            if(i==decodificar.length()-1)
+        }
+        if(i==decodificar.length()-2)
             return decodificado;
+    }
+}
+string int_bin_protobuf(int num){
+    string bin="";
+    while(num>0)
+    if(num<=127){
+        string n="00000000";
+        for (int j = 7; j>=0; j--) {
+            if (num % 2 == 0) {
+                n[j]= '0';
+                num = num / 2;
+            }
+            else {
+                n[j]= '1';
+                num = num / 2;
+            }
+        }
+    bin+=n;
+    }
+    else{
+        num-=127;
+        bin+="11111111";
+
+    }
+
+return bin;
+}
+string salvar_lista(lno *a){
+if(a){
+    return salvar_lista(a->proximo)+a->caracter+codificador(int_bin_protobuf(a->frequencia));
+}
+return "";
+
+}
+int bin_protobuf_int(string n){
+    int dec=0;
+    for(int i=0;i<n.length();i+=8){
+        int l=0;
+        for(int j=i+7;j>i;j--)
+                dec += pow(2, l++) * (n[j] - '0');
+        if(n[i]=='0')
+            i=n.length();
+    }
+    return dec;
+}
+lista* ler_dicionario(string d){
+    lista * l=criar_vazia();
+    int n=0;
+    string y="";
+    y+=d[n];
+    string bin = str_bin(y);
+    int k=0;
+    int num=0;
+    while(bin[k]=='1'){
+        num+=bin_protobuf_int(bin);
+        y="";
+        y+=d[++n];
+        bin=str_bin(y);
+        k++;
+    }
+    num+=bin_protobuf_int(bin);
+    for(int i =n; i<=num;i++){
+        int x=i;
+        y="";
+        y+=d[++x];
+        string bin = str_bin(y);
+        int j=0;
+        int numero=0;
+        while(bin[j]=='1'){
+            numero+=bin_protobuf_int(bin);
+            y="";
+            y+=d[++x];
+            bin=str_bin(y);
+            j++;
+        }
+        numero+=bin_protobuf_int(bin);
+        add_em_ordem(l,criar_no(d[i],"",numero,criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio()));
+        i=x;
 
     }
 }
-int main () {
-//string s =receber_arquivo("C:\\Users\\pattr\\OneDrive - Fundação Edson Queiroz - Universidade de Fortaleza\\Área de Trabalho\\projetos av3 estruturas.txt");
+int main(){
 string s =receber_arquivo("teste.txt");
 lista *l=criar_vazia();
 cout<<s;
 l=criar_lista_frequencia(s);
-
+string dicionario=salvar_lista(l->inicio); /// salvando lista para dicionario
 cout<<"######################################### Lista iniciar de caracteres e quantidades"<<endl;
 mostrarlista(l);
 criar_arvore(l,0);
@@ -320,23 +375,37 @@ mostrarlista(novos);
 cout<<"######################################### Novo dado"<<endl;
 string novodado= binario(s,novos);
 cout<<novodado<<endl;
-string codificado=codificador(novodado);
-cout<<"#########################################Codificado"<<endl;
+cout<<"######################################### Dicionario"<<endl;
+cout<<dicionario.length()<<endl;
+string tamanho_dicionario=codificador(int_bin_protobuf(dicionario.length()));
+string tamanho_arquivo_bin=codificador(int_bin_protobuf(novodado.length()));
+string dicionario_completo=tamanho_dicionario+dicionario+tamanho_arquivo_bin;
+cout<<"dicionario_completo: "<<dicionario_completo<<endl;
 
+
+cout<<"######################################### Codificado"<<endl;
+string codificado=codificador(novodado);
 cout<<codificado<<endl;
 
+
 ofstream out("codificado.txt");
-    out << codificado;
+    out << dicionario_completo+codificado;
     out.close();
-
-
 ///////////////////////////////////////////////////////////
+cout<<"######################################### Recebendo arquivo com dados codificados"<<endl;
+codificado=receber_arquivo("codificado.txt");
+cout<<codificado<<endl;
+/// refazer lista e arvore
+lista * dici= ler_dicionario(codificado);
+mostrarlista(dici);
+criar_arvore(dici,0);
+mostrar_arvore(dici->inicio,"");
 
-cout<<"#########################################Binario re feito"<<endl;
+cout<<"######################################### Binario re feito"<<endl;
 string decodificar=str_bin(codificado);
 
 cout<<decodificar<<endl;
-
+cout<<"######################################### Decodificado"<<endl;
 string decodificado=decodificador(decodificar,l->inicio,l->inicio,0,"");
 cout<<decodificado<<endl;
 
