@@ -114,10 +114,7 @@ string receber_arquivo(string str){
         caminho_arquivo.close();
       }
       else cout << "Unable to open file";
-    string t="";
-    for(int i=0;i<s.length()-1;i++)
-        t+=s[i];
-    return t;
+    return s;
 }
 lista *criar_lista_frequencia(string s){
     lista* l=criar_vazia();
@@ -126,7 +123,7 @@ char value[s.length()];
 for(int i =0; i<sizeof(value)-1;i++){
         if(!buscar(l,value[i])){
             lno *t=criar_no(value[i],"00000000",quantidade(s,value[i]),criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio());
-            cout<<t->caracter <<"  "<<t->frequencia<<endl;
+            //cout<<t->caracter <<"  "<<t->frequencia<<endl;
             add_em_ordem(l,t);
             }
 
@@ -221,7 +218,7 @@ int j=0;
 if(novodado.length()%8!=0)
     for(int i= 0;i<(novodado.length()%8);i++)
         novodado+='0';
-cout<<novodado<<endl;
+//cout<<novodado<<endl;
 for(int i=0;i<novodado.length();i++){
 
     if(j<8){
@@ -229,12 +226,12 @@ for(int i=0;i<novodado.length();i++){
         j++;
     }
     if(j==8){
-        cout<<numero<<endl;
+        //cout<<numero<<endl;
         int novoValor=0;
         int l=0;
         for (int k = 7 ; k >=0; k--)
                 novoValor += pow(2, l++) * (numero[k] - '0');
-        cout<< novoValor<<endl;
+        //cout<< novoValor<<endl;
         codificado+=novoValor;
 
         numero="";
@@ -249,7 +246,7 @@ string str_bin(string codificado){
  for(int i=0;i<codificado.length();i++){
     int num = codificado[i]+256;
     string bin="00000000";
-    cout<<codificado[i]<<"->"<<num<<"->";
+    //cout<<codificado[i]<<"->"<<num<<"->";
         for (int j = 7; j>=0; j--) {
             if (num % 2 == 0) {
                 bin[j]= '0';
@@ -260,7 +257,7 @@ string str_bin(string codificado){
                 num = num / 2;
             }
         }
-        cout<<bin<<endl;
+        //cout<<bin<<endl;
     decodificar+=bin;
 
  }
@@ -305,7 +302,7 @@ int bin_protobuf_int(string n){
         for(int j=i+7;j>i;j--)
                 dec += pow(2, l++) * (n[j] - '0');
         if(n[i]=='0')
-            i=n.length();
+            break;
     }
     return dec;
 }
@@ -355,41 +352,42 @@ string ler_arquivo(string d){
     int k=0;
     int num=0;
     while(bin[k]=='1'){
-        num+=bin_protobuf_int(bin);
         y="";
         y+=d[++n];
-        bin=str_bin(y);
+        bin+=str_bin(y);
         k++;
     }
     num+=bin_protobuf_int(bin);
-    cout<<n<<endl;
+    cout<<"numero brotobuf: "<<bin<<endl;
+    cout<<"inicio do dado: "<<n+1<<endl;
+    cout<<"tamanho do dado: "<<num<<endl;
     n+=num+1;
     y="";
     y+=d[n];
-    cout<<y<<endl;
+    //cout<<y<<endl;
     bin = str_bin(y);
     k=0;
     num=0;
     while(bin[k]=='1'){
-        num+=bin_protobuf_int(bin);
         y="";
         y+=d[++n];
-        bin=str_bin(y);
-        k++;
+        bin+=str_bin(y);
+        k+=8;
     }
     num+=bin_protobuf_int(bin);
-
+    cout<<"numero brotobuf: "<<bin<<endl;
+    cout<<"inicio do dado: "<<n+1<<endl;
+    cout<<"tamanho do dado: "<<num<<endl;
     string decodificar="";
     string binario="";
-    cout<<"inicio: "<<n+1<<endl;
-    cout<<"fim: "<<n+1+num<<endl;
-    cout<<"binario total"<<str_bin(d)<<endl;
+
+    //cout<<"binario total: "<<str_bin(d)<<endl;
     for(int i =n+1; i<d.length();i++){
         binario+=d[i];
      }
-     cout<<"antes do binario: "<<binario<<endl;
+     //cout<<"antes do binario: "<<binario<<endl;
      binario=str_bin(binario);
-     cout<<"depois do binario: "<<binario<<endl;
+     //cout<<"depois do binario: "<<binario<<endl;
      for(int i=0; i<num;i++){
         decodificar+=binario[i];
      }
@@ -398,28 +396,44 @@ string ler_arquivo(string d){
 
 }
 string decodificador(string decodificar,lno * raiz ,lno * a,int i,string decodificado){
-    if(a){
-        if(!a->direita && !a->esquerda)
-            return a->caracter+decodificador(decodificar,raiz,raiz,i,decodificado);
+
+    if(i<decodificar.length()){
+        if (!a->esquerda&&!a->direita)
+            decodificador(decodificar, raiz,raiz,i+1,decodificado+a->caracter);
         if(decodificar[i]=='0')
-            return decodificado+decodificador(decodificar,raiz,a->esquerda,i+1,"");
+            decodificador(decodificar, raiz,a->esquerda,i+1,decodificado);
         if(decodificar[i]=='1')
-            return decodificado+decodificador(decodificar,raiz,a->direita,i+1,"");
+            decodificador(decodificar, raiz,a->direita,i+1,decodificado);
+    }else return decodificado;
+
+/*
+
+
+    for(int i = 0; i<decodificar.length();i++){
+        if (!a->esquerda&&!a->direita){
+            decodificado+=a->caracter;
+            a=raiz;
+        }
+        if(decodificar[i]=='0')
+            a= a->esquerda;
+        if(decodificar[i]=='1')
+            a= a->direita;
 
     }
-    return "";
+    return decodificado;
+*/
 }
 int main(){
-string s =receber_arquivo("teste.txt");
+string s =receber_arquivo("tested.txt");
 lista *l=criar_vazia();
-cout<<s;
+cout<<s<<endl;
 l=criar_lista_frequencia(s);
 string dicionario=salvar_lista(l->inicio); /// salvando lista para dicionario
 cout<<"######################################### Lista iniciar de caracteres e quantidades"<<endl;
 mostrarlista(l);
 criar_arvore(l,0);
-cout<<"######################################### Arvore de valores"<<endl;
-mostrar_arvore(l->inicio,"");
+//cout<<"######################################### Arvore de valores"<<endl;
+//mostrar_arvore(l->inicio,"");
 lista *novos=criar_vazia();
 novos_valores(l->inicio,novos,"");
 cout<<"######################################### Lista de novos valores"<<endl;
@@ -445,19 +459,21 @@ ofstream out("codificado.txt");
     out.close();
 ///////////////////////////////////////////////////////////
 cout<<"######################################### Recebendo arquivo com dados codificados"<<endl;
-codificado=receber_arquivo("codificado.txt");
+//codificado=receber_arquivo("codificado.txt");
+codificado=dicionario_completo+codificado;
 cout<<codificado<<endl;
 /// refazer lista e arvore
 lista * dici= ler_dicionario(codificado);
-mostrarlista(dici);
 criar_arvore(dici,0);
 mostrar_arvore(dici->inicio,"");
+//mostrar_arvore(dici->inicio,"");
 
 cout<<"######################################### Binario re feito"<<endl;
 string decodificar=ler_arquivo(codificado);
 cout<<decodificar<<endl;
 cout<<"######################################### Decodificado"<<endl;
-string decodificado=decodificador(decodificar,l->inicio,l->inicio,0,"");
+string decodificado="";
+decodificado=decodificador(decodificar,l->inicio,l->inicio,0,decodificado);
 cout<<decodificado;
 
 ofstream out1("decodificado.txt");
