@@ -396,17 +396,19 @@ string ler_arquivo(string d){
 
 }
 string decodificador(string decodificar,lno * raiz ,lno * a,int i,string decodificado){
-
-    if(i<decodificar.length()){
-        if (!a->esquerda&&!a->direita)
-            decodificador(decodificar, raiz,raiz,i+1,decodificado+a->caracter);
-        if(decodificar[i]=='0')
-            decodificador(decodificar, raiz,a->esquerda,i+1,decodificado);
-        if(decodificar[i]=='1')
-            decodificador(decodificar, raiz,a->direita,i+1,decodificado);
-    }else return decodificado;
-
 /*
+    if(i<decodificar.length()){
+        if (!a->esquerda&&!a->direita){
+            decodificado+=a->caracter;
+            decodificador(decodificar, raiz,raiz,i,decodificado);
+        }
+        else if(decodificar[i]=='0')
+            decodificador(decodificar, raiz,a->esquerda,i+1,decodificado);
+        else if(decodificar[i]=='1')
+            decodificador(decodificar, raiz,a->direita,i+1,decodificado);
+    }
+*/
+
 
 
     for(int i = 0; i<decodificar.length();i++){
@@ -421,7 +423,7 @@ string decodificador(string decodificar,lno * raiz ,lno * a,int i,string decodif
 
     }
     return decodificado;
-*/
+
 }
 int main(){
 string s =receber_arquivo("tested.txt");
@@ -472,10 +474,9 @@ cout<<"######################################### Binario re feito"<<endl;
 string decodificar=ler_arquivo(codificado);
 cout<<decodificar<<endl;
 cout<<"######################################### Decodificado"<<endl;
-string decodificado="";
-decodificado=decodificador(decodificar,l->inicio,l->inicio,0,decodificado);
-cout<<decodificado;
 
+string decodificado=decodificador(decodificar,l->inicio,l->inicio,0,decodificado);
+cout<<decodificado;
 ofstream out1("decodificado.txt");
     out1 << decodificado;
     out1.close();
