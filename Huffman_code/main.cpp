@@ -114,13 +114,16 @@ string receber_arquivo(string str){
         caminho_arquivo.close();
       }
       else cout << "Unable to open file";
-    return s;
+      string t="";
+      for (int i = 0;i<s.length()-1;i++)
+        t+=s[i];
+      return t;
 }
 lista *criar_lista_frequencia(string s){
     lista* l=criar_vazia();
 char value[s.length()];
     strcpy(value, s.c_str());
-for(int i =0; i<sizeof(value)-1;i++){
+for(int i =0; i<sizeof(value);i++){
         if(!buscar(l,value[i])){
             lno *t=criar_no(value[i],"00000000",quantidade(s,value[i]),criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio());
             //cout<<t->caracter <<"  "<<t->frequencia<<endl;
@@ -163,9 +166,10 @@ void criar_arvore(lista *a,int i){
 void mostrar_arvore(lno *a,string s){
     if(a){
         //if(!a->esquerda&& !a->direita)
+        cout<<s<<"  caractere: "<<a->caracter<<" quantidade: "<<a->frequencia<<endl;
         mostrar_arvore(a->esquerda,s+'0');
         mostrar_arvore(a->direita,s+'1');
-        cout<<s<<"  caractere: "<<a->caracter<<" quantidade: "<<a->frequencia<<endl;
+
     }
 
 }
@@ -315,14 +319,13 @@ lista* ler_dicionario(string d){
     int k=0;
     int num=0;
     while(bin[k]=='1'){
-        num+=bin_protobuf_int(bin);
         y="";
         y+=d[++n];
-        bin=str_bin(y);
-        k++;
+        bin+=str_bin(y);
+        k+=8;
     }
     num+=bin_protobuf_int(bin);
-    for(int i =n+1; i<=num;i++){
+    for(int i =n+1; i<num+n+1;i++){
         int x=i;
         y="";
         y+=d[++x];
@@ -330,11 +333,10 @@ lista* ler_dicionario(string d){
         int j=0;
         int numero=0;
         while(bin[j]=='1'){
-            numero+=bin_protobuf_int(bin);
             y="";
             y+=d[++x];
-            bin=str_bin(y);
-            j++;
+            bin+=str_bin(y);
+            j+=8;
         }
         numero+=bin_protobuf_int(bin);
         add_em_ordem(l,criar_no(d[i],"00000000",numero,criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio()));
@@ -355,12 +357,14 @@ string ler_arquivo(string d){
         y="";
         y+=d[++n];
         bin+=str_bin(y);
-        k++;
+        k+=8;
     }
     num+=bin_protobuf_int(bin);
+    /*
     cout<<"numero brotobuf: "<<bin<<endl;
     cout<<"inicio do dado: "<<n+1<<endl;
     cout<<"tamanho do dado: "<<num<<endl;
+    */
     n+=num+1;
     y="";
     y+=d[n];
@@ -375,9 +379,11 @@ string ler_arquivo(string d){
         k+=8;
     }
     num+=bin_protobuf_int(bin);
+    /*
     cout<<"numero brotobuf: "<<bin<<endl;
     cout<<"inicio do dado: "<<n+1<<endl;
     cout<<"tamanho do dado: "<<num<<endl;
+        */
     string decodificar="";
     string binario="";
 
@@ -387,6 +393,7 @@ string ler_arquivo(string d){
      }
      //cout<<"antes do binario: "<<binario<<endl;
      binario=str_bin(binario);
+     cout<<"tamanho do binario bruto final: "<<binario.length()<<endl;
      //cout<<"depois do binario: "<<binario<<endl;
      for(int i=0; i<num;i++){
         decodificar+=binario[i];
@@ -409,18 +416,16 @@ string decodificador(string decodificar,lno * raiz ,lno * a,int i,string decodif
     }
 */
 
+    for(int j = 0; j<decodificar.length();j++){
 
-
-    for(int i = 0; i<decodificar.length();i++){
+        if(decodificar[j]=='0')
+            a= a->esquerda;
+        if(decodificar[j]=='1')
+            a= a->direita;
         if (!a->esquerda&&!a->direita){
             decodificado+=a->caracter;
             a=raiz;
         }
-        if(decodificar[i]=='0')
-            a= a->esquerda;
-        if(decodificar[i]=='1')
-            a= a->direita;
-
     }
     return decodificado;
 
@@ -428,58 +433,64 @@ string decodificador(string decodificar,lno * raiz ,lno * a,int i,string decodif
 int main(){
 string s =receber_arquivo("tested.txt");
 lista *l=criar_vazia();
-cout<<s<<endl;
+//cout<<s<<endl;
+cout<<"tamanho do arquivo inicial: "<<s.length()<<endl;
 l=criar_lista_frequencia(s);
 string dicionario=salvar_lista(l->inicio); /// salvando lista para dicionario
-cout<<"######################################### Lista iniciar de caracteres e quantidades"<<endl;
-mostrarlista(l);
+//cout<<"######################################### Lista iniciar de caracteres e quantidades"<<endl;
+//mostrarlista(l);
 criar_arvore(l,0);
 //cout<<"######################################### Arvore de valores"<<endl;
 //mostrar_arvore(l->inicio,"");
 lista *novos=criar_vazia();
 novos_valores(l->inicio,novos,"");
-cout<<"######################################### Lista de novos valores"<<endl;
-mostrarlista(novos);
-cout<<"######################################### Novo dado"<<endl;
+//cout<<"######################################### Lista de novos valores"<<endl;
+//mostrarlista(novos);
+//cout<<"######################################### Novo dado"<<endl;
 string novodado= binario(s,novos);
-cout<<novodado<<endl;
-cout<<"######################################### Dicionario"<<endl;
-cout<<dicionario.length()<<endl;
+//cout<<novodado<<endl;
+cout<<"tamanho do binario inicial: "<<novodado.length()<<"  "<<bin_protobuf_int(int_bin_protobuf(novodado.length())) <<endl;
+//cout<<"######################################### Dicionario"<<endl;
+//cout<<dicionario.length()<<endl;
 string tamanho_dicionario=codificador(int_bin_protobuf(dicionario.length()));
 string tamanho_arquivo_bin=codificador(int_bin_protobuf(novodado.length()));
 string dicionario_completo=tamanho_dicionario+dicionario+tamanho_arquivo_bin;
-cout<<"dicionario_completo: "<<dicionario_completo<<endl;
-cout<<"tamanho do dado: "<<novodado.length()<<endl;
+//cout<<"dicionario_completo: "<<dicionario_completo<<endl;
+//cout<<"tamanho do dado: "<<novodado.length()<<endl;
 
-cout<<"######################################### Codificado"<<endl;
+//cout<<"######################################### Codificado"<<endl;
 string codificado=codificador(novodado);
-cout<<codificado<<endl;
+cout<<"tamanho do codificado inicial: "<<dicionario_completo.length()+codificado.length()<<endl;
+//cout<<codificado<<endl;
 
 
 ofstream out("codificado.txt");
     out << dicionario_completo+codificado;
     out.close();
 ///////////////////////////////////////////////////////////
-cout<<"######################################### Recebendo arquivo com dados codificados"<<endl;
-//codificado=receber_arquivo("codificado.txt");
-codificado=dicionario_completo+codificado;
-cout<<codificado<<endl;
+//cout<<"######################################### Recebendo arquivo com dados codificados"<<endl;
+
+codificado=receber_arquivo("codificado.txt");
+cout<<"tamanho do codificado final: "<<codificado.length()<<endl;
+//cout<<codificado<<endl;
 /// refazer lista e arvore
 lista * dici= ler_dicionario(codificado);
+//mostrarlista(dici);
 criar_arvore(dici,0);
-mostrar_arvore(dici->inicio,"");
 //mostrar_arvore(dici->inicio,"");
 
-cout<<"######################################### Binario re feito"<<endl;
-string decodificar=ler_arquivo(codificado);
-cout<<decodificar<<endl;
-cout<<"######################################### Decodificado"<<endl;
 
-string decodificado=decodificador(decodificar,l->inicio,l->inicio,0,decodificado);
-cout<<decodificado;
+//cout<<"######################################### Binario re feito"<<endl;
+string decodificar=ler_arquivo(codificado);
+cout<<"tamanho do binario final: "<<decodificar.length()<<endl;
+//cout<<decodificar<<endl;
+//cout<<"######################################### Decodificado"<<endl;
+string decodificado=decodificador(decodificar,dici->inicio,dici->inicio,0,"");
+//cout<<decodificado;
+cout<<"tamanho do arquivo final: "<<decodificado.length()<<endl;
 ofstream out1("decodificado.txt");
     out1 << decodificado;
     out1.close();
-
+cout<<"fim";
   return 0;
 }
