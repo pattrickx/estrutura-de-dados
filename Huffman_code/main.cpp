@@ -119,6 +119,67 @@ string receber_arquivo(string str){
         t+=s[i];
       return t;
 }
+lno* get_no(lno* a, char c){
+if(a){
+    if(a->caracter==c)
+        return a;
+get_no(a->proximo,c);
+}else cout<<"não encontrado";
+
+}
+string receber_arquivo_t(string str){
+    string s;
+    int sizeOfFile = 0;
+    ifstream caminho_arquivo(str.c_str(), std::ios::binary);
+
+      if (caminho_arquivo.is_open()){
+
+        char buffer;
+          while(caminho_arquivo.read((char *)&buffer,sizeof(buffer)))
+          {
+             s+=buffer;
+             sizeOfFile++;
+            }
+
+        caminho_arquivo.close();
+      }
+      cout << " sizeOfFile " << sizeOfFile << endl;
+     return s;
+
+}
+lista* reorganizar(lno** x){
+lista* l= criar_vazia();
+while(*x){
+    add_em_ordem(l,*x);
+    x=&(*x)->proximo;
+}
+mostrar(l);
+return l;
+}
+lista* receber_arquivo_bin(string str){
+    lista* l=criar_vazia();
+    int sizeOfFile = 0;
+    ifstream caminho_arquivo(str.c_str(), std::ios::binary);
+
+      if (caminho_arquivo.is_open()){
+
+        char buffer;
+          while(caminho_arquivo.read((char *)&buffer,sizeof(buffer)))
+          {//cout<<buffer;
+              sizeOfFile++;
+              if (!buscar(l,buffer)){
+                add_em_ordem(l,criar_no(buffer,"00000000",1,criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio()));
+              }else{
+              get_no(l->inicio,buffer)->frequencia++;
+              }
+            }
+
+        caminho_arquivo.close();
+      }
+      cout <<endl <<" sizeOfFile " << sizeOfFile << endl;
+
+     return l;
+}
 lista *criar_lista_frequencia(string s){
     lista* l=criar_vazia();
 char value[s.length()];
@@ -206,6 +267,22 @@ if(n){
     buscar_novo(c,n->proximo);
 }
 }
+string binario_bin(string str,lista *novos){
+    ifstream caminho_arquivo(str.c_str(), std::ios::binary);
+        string n="";
+      if (caminho_arquivo.is_open()){
+
+        char buffer;
+          while(caminho_arquivo.read((char *)&buffer,sizeof(buffer)))
+          {
+             n+=buscar_novo(buffer,novos->inicio);
+            }
+
+        caminho_arquivo.close();
+      }
+return n;
+}
+
 string binario(string s,lista *novos){
     string n="";
     char value[s.length()];
@@ -427,55 +504,46 @@ string decodificador(string decodificar,lno * raiz ,lno * a,int i,string decodif
             a=raiz;
         }
     }
+
     return decodificado;
 
 }
 int main(){
-string s =receber_arquivo("tested.txt");
+
 lista *l=criar_vazia();
-//cout<<s<<endl;
-cout<<"tamanho do arquivo inicial: "<<s.length()<<endl;
-l=criar_lista_frequencia(s);
-string dicionario=salvar_lista(l->inicio); /// salvando lista para dicionario
-//cout<<"######################################### Lista iniciar de caracteres e quantidades"<<endl;
+string src="test.exe";
+//1596852
+l=receber_arquivo_bin(src);
 //mostrarlista(l);
+reorganizar(&(l->inicio));
+string dicionario=salvar_lista(l->inicio); /// salvando lista para dicionario
+
 criar_arvore(l,0);
-//cout<<"######################################### Arvore de valores"<<endl;
-//mostrar_arvore(l->inicio,"");
+
 lista *novos=criar_vazia();
 novos_valores(l->inicio,novos,"");
-//cout<<"######################################### Lista de novos valores"<<endl;
-//mostrarlista(novos);
-//cout<<"######################################### Novo dado"<<endl;
-string novodado= binario(s,novos);
-//cout<<novodado<<endl;
+
+string novodado= binario_bin(src,novos);
+
 cout<<"tamanho do binario inicial: "<<novodado.length()<<"  "<<bin_protobuf_int(int_bin_protobuf(novodado.length())) <<endl;
-//cout<<"######################################### Dicionario"<<endl;
-//cout<<dicionario.length()<<endl;
+
 string tamanho_dicionario=codificador(int_bin_protobuf(dicionario.length()));
 string tamanho_arquivo_bin=codificador(int_bin_protobuf(novodado.length()));
 string dicionario_completo=tamanho_dicionario+dicionario+tamanho_arquivo_bin;
-//cout<<"dicionario_completo: "<<dicionario_completo<<endl;
-//cout<<"tamanho do dado: "<<novodado.length()<<endl;
 
-//cout<<"######################################### Codificado"<<endl;
 string codificado=codificador(novodado);
 cout<<"tamanho do codificado inicial: "<<dicionario_completo.length()+codificado.length()<<endl;
-//cout<<codificado<<endl;
 
 
-ofstream out("codificado.txt");
+
+ofstream out("codificado.exe",std::fstream::trunc|std::fstream::binary);
     out << dicionario_completo+codificado;
     out.close();
-///////////////////////////////////////////////////////////
-//cout<<"######################################### Recebendo arquivo com dados codificados"<<endl;
 
-codificado=receber_arquivo("codificado.txt");
-cout<<"tamanho do codificado final: "<<codificado.length()<<endl;
-//cout<<codificado<<endl;
-/// refazer lista e arvore
+codificado=receber_arquivo_t("codificado.exe");
+
 lista * dici= ler_dicionario(codificado);
-//mostrarlista(dici);
+mostrarlista(dici);
 criar_arvore(dici,0);
 //mostrar_arvore(dici->inicio,"");
 
@@ -486,9 +554,10 @@ cout<<"tamanho do binario final: "<<decodificar.length()<<endl;
 //cout<<decodificar<<endl;
 //cout<<"######################################### Decodificado"<<endl;
 string decodificado=decodificador(decodificar,dici->inicio,dici->inicio,0,"");
+//system("pause");
 //cout<<decodificado;
 cout<<"tamanho do arquivo final: "<<decodificado.length()<<endl;
-ofstream out1("decodificado.txt");
+ofstream out1("decodificado.exe",std::fstream::trunc|std::fstream::binary);
     out1 << decodificado;
     out1.close();
 cout<<"fim";
