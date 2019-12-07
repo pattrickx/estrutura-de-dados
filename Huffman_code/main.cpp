@@ -147,14 +147,26 @@ string receber_arquivo_t(string str){
      return s;
 
 }
-lista* reorganizar(lno** x){
-lista* l= criar_vazia();
-while(*x){
-    add_em_ordem(l,*x);
-    x=&(*x)->proximo;
+void mostrar(lno *a){
+if(a){
+    cout<<"caractere: "<<a->caracter<<" novo_caracter: "<<a->novo_caracter<<" quantidade: "<<a->frequencia<<endl;
+    mostrar(a->proximo);
+    }
 }
-mostrar(l);
-return l;
+void mostrarlista(lista *a){
+    if(a->inicio)
+    mostrar(a->inicio);
+}
+lista* reorganizar(lno* a){
+    lista* l=criar_vazia();
+while(a){
+    //cout<<"caractere: "<<a->caracter<<" novo_caracter: "<<a->novo_caracter<<" quantidade: "<<a->frequencia<<endl;
+
+      add_em_ordem(l,criar_no(a->caracter,"00000000",a->frequencia,criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio()));
+               a=a->proximo;
+    }
+
+    return l;
 }
 lista* receber_arquivo_bin(string str){
     lista* l=criar_vazia();
@@ -176,9 +188,9 @@ lista* receber_arquivo_bin(string str){
 
         caminho_arquivo.close();
       }
-      cout <<endl <<" sizeOfFile " << sizeOfFile << endl;
-
-     return l;
+       cout << " sizeOfFile " << sizeOfFile << endl;
+        //reorganizar(l->inicio);
+     return reorganizar(l->inicio);
 }
 lista *criar_lista_frequencia(string s){
     lista* l=criar_vazia();
@@ -194,16 +206,6 @@ for(int i =0; i<sizeof(value);i++){
 }
 return l;
 
-}
-void mostrar(lno *a){
-if(a){
-    cout<<"caractere: "<<a->caracter<<" novo_caracter: "<<a->novo_caracter<<" quantidade: "<<a->frequencia<<endl;
-    mostrar(a->proximo);
-    }
-}
-void mostrarlista(lista *a){
-    if(a->inicio)
-    mostrar(a->inicio);
 }
 void remover_primeiro(lista *a){
     if(!a->inicio->proximo)
@@ -282,7 +284,6 @@ string binario_bin(string str,lista *novos){
       }
 return n;
 }
-
 string binario(string s,lista *novos){
     string n="";
     char value[s.length()];
@@ -511,11 +512,19 @@ string decodificador(string decodificar,lno * raiz ,lno * a,int i,string decodif
 int main(){
 
 lista *l=criar_vazia();
-string src="test.exe";
-//1596852
-l=receber_arquivo_bin(src);
-//mostrarlista(l);
-reorganizar(&(l->inicio));
+cout<<"digite caminho do arquivo"<<endl;
+string str="";// material de teste\\test.exe
+getline( cin, str );
+cout<<str<<endl;
+string tipo="";
+for(int i=str.length()-1;i>=0 && str[i]!='.';i--)
+    tipo=str[i]+tipo;
+tipo='.'+tipo;
+cout<<tipo<<endl;
+
+l=receber_arquivo_bin(str);
+
+
 string dicionario=salvar_lista(l->inicio); /// salvando lista para dicionario
 
 criar_arvore(l,0);
@@ -523,7 +532,7 @@ criar_arvore(l,0);
 lista *novos=criar_vazia();
 novos_valores(l->inicio,novos,"");
 
-string novodado= binario_bin(src,novos);
+string novodado= binario_bin(str,novos);
 
 cout<<"tamanho do binario inicial: "<<novodado.length()<<"  "<<bin_protobuf_int(int_bin_protobuf(novodado.length())) <<endl;
 
@@ -536,28 +545,26 @@ cout<<"tamanho do codificado inicial: "<<dicionario_completo.length()+codificado
 
 
 
-ofstream out("codificado.exe",std::fstream::trunc|std::fstream::binary);
+ofstream out((str+"-compactado.bin").c_str(),std::fstream::trunc|std::fstream::binary);
     out << dicionario_completo+codificado;
     out.close();
 
-codificado=receber_arquivo_t("codificado.exe");
+codificado=receber_arquivo_t(str+"-compactado.bin");
 
 lista * dici= ler_dicionario(codificado);
-mostrarlista(dici);
+
 criar_arvore(dici,0);
-//mostrar_arvore(dici->inicio,"");
 
 
-//cout<<"######################################### Binario re feito"<<endl;
+
+
 string decodificar=ler_arquivo(codificado);
 cout<<"tamanho do binario final: "<<decodificar.length()<<endl;
-//cout<<decodificar<<endl;
-//cout<<"######################################### Decodificado"<<endl;
+
 string decodificado=decodificador(decodificar,dici->inicio,dici->inicio,0,"");
-//system("pause");
-//cout<<decodificado;
+
 cout<<"tamanho do arquivo final: "<<decodificado.length()<<endl;
-ofstream out1("decodificado.exe",std::fstream::trunc|std::fstream::binary);
+ofstream out1((str+"-descompactado"+tipo).c_str(),std::fstream::trunc|std::fstream::binary);
     out1 << decodificado;
     out1.close();
 cout<<"fim";
