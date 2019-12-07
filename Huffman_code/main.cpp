@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <windows.h>
+#include <conio.h>
 using namespace std;
 #include <bits/stdc++.h>
 struct lno{
@@ -510,63 +512,146 @@ string decodificador(string decodificar,lno * raiz ,lno * a,int i,string decodif
 
 }
 int main(){
-
 lista *l=criar_vazia();
-cout<<"digite caminho do arquivo"<<endl;
-string str="";// material de teste\\test.exe
-getline( cin, str );
-cout<<str<<endl;
-string tipo="";
-for(int i=str.length()-1;i>=0 && str[i]!='.';i--)
-    tipo=str[i]+tipo;
-tipo='.'+tipo;
-cout<<tipo<<endl;
+        string Menu[3] = {"Compactar", "Descompactar", "Exit"};
+        int cursor = 0;
 
-l=receber_arquivo_bin(str);
+	while(true){
+
+        system("cls");
+
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+		cout << "Menu"<<endl;
+
+		for (int i = 0; i < 3; ++i){
+			if (i == cursor)
+			{
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 11);
+				cout << Menu[i] << endl;
+			}
+			else
+			{
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+				cout << Menu[i] << endl;
+			}
+		}
+
+		while(true){
+            if(kbhit()){
+            int tecla=getch();
+            Sleep(100);
+			if (tecla == 72){
+				cursor -= 1;
+				if (cursor == -1)
+					cursor = 2;
+				break;
+			}
+			else if (tecla== 80){
+				cursor += 1;
+				if (cursor == 3)
+					cursor = 0;
+				break;
+			}
+			else if (tecla == 13){
+
+				switch (cursor){
+					case 0:
+					{
+						cout << "Digite caminho do arquivo"<<endl;
+						string str="";// material de teste\test.exe
+                        getline( cin, str );
+                        string tipo="";
+                        for(int i=str.length()-1;i>=0 && str[i]!='.';i--)
+                            tipo=str[i]+tipo;
+                        tipo='.'+tipo;
+                        //cout<<tipo<<endl;
+
+                        l=receber_arquivo_bin(str);
 
 
-string dicionario=salvar_lista(l->inicio); /// salvando lista para dicionario
+                        string dicionario=salvar_lista(l->inicio); /// salvando lista para dicionario
 
-criar_arvore(l,0);
+                        criar_arvore(l,0);
 
-lista *novos=criar_vazia();
-novos_valores(l->inicio,novos,"");
+                        lista *novos=criar_vazia();
+                        novos_valores(l->inicio,novos,"");
 
-string novodado= binario_bin(str,novos);
+                        string novodado= binario_bin(str,novos);
 
-cout<<"tamanho do binario inicial: "<<novodado.length()<<"  "<<bin_protobuf_int(int_bin_protobuf(novodado.length())) <<endl;
+                        cout<<"tamanho do binario inicial: "<<novodado.length()<<"  "<<bin_protobuf_int(int_bin_protobuf(novodado.length())) <<endl;
 
-string tamanho_dicionario=codificador(int_bin_protobuf(dicionario.length()));
-string tamanho_arquivo_bin=codificador(int_bin_protobuf(novodado.length()));
-string dicionario_completo=tamanho_dicionario+dicionario+tamanho_arquivo_bin;
+                        string tamanho_dicionario=codificador(int_bin_protobuf(dicionario.length()));
+                        string tamanho_arquivo_bin=codificador(int_bin_protobuf(novodado.length()));
+                        string dicionario_completo=tamanho_dicionario+dicionario+tamanho_arquivo_bin;
 
-string codificado=codificador(novodado);
-cout<<"tamanho do codificado inicial: "<<dicionario_completo.length()+codificado.length()<<endl;
-
-
-
-ofstream out((str+"-compactado.bin").c_str(),std::fstream::trunc|std::fstream::binary);
-    out << dicionario_completo+codificado;
-    out.close();
-
-codificado=receber_arquivo_t(str+"-compactado.bin");
-
-lista * dici= ler_dicionario(codificado);
-
-criar_arvore(dici,0);
+                        string codificado=codificador(novodado);
+                        cout<<"tamanho do codificado inicial: "<<dicionario_completo.length()+codificado.length()<<endl;
 
 
 
+                        ofstream out((str+"-compactado.bin").c_str(),std::fstream::trunc|std::fstream::binary);
+                            out << dicionario_completo+codificado;
+                            out.close();
+                        cout<<"Arquivo compactado"<<endl;
 
-string decodificar=ler_arquivo(codificado);
-cout<<"tamanho do binario final: "<<decodificar.length()<<endl;
+                       Sleep(1000);
+					} break;
+					case 1:
+					{
+						cout << "Digite camino do arquivo"<<endl;
+						string str="";// material de teste\test.exe-compactado.bin
+                        getline( cin, str );
+                        string tipo="";
+                        for(int i=str.length()-1;i>=0 && str[i]!='.';i--)
+                            tipo=str[i]+tipo;
+                        tipo='.'+tipo;
+                        //cout<<tipo<<endl;
+						string codificado=receber_arquivo_t(str);
+						int aux=0;
+                        for(int i=str.length()-1;i>=0 && str[i]!='-';i--)
+                            aux++;
+                        aux++;
+                        string aux1="";
+                        for(int i=0;i<str.length()-aux ;i++)
+                            aux1+=str[i];
+                        str=aux1;
+                        cout<<str<<endl;
+                        lista * dici= ler_dicionario(codificado);
 
-string decodificado=decodificador(decodificar,dici->inicio,dici->inicio,0,"");
+                        criar_arvore(dici,0);
 
-cout<<"tamanho do arquivo final: "<<decodificado.length()<<endl;
-ofstream out1((str+"-descompactado"+tipo).c_str(),std::fstream::trunc|std::fstream::binary);
-    out1 << decodificado;
-    out1.close();
-cout<<"fim";
+                        string decodificar=ler_arquivo(codificado);
+                        cout<<"tamanho do binario final: "<<decodificar.length()<<endl;
+
+                        string decodificado=decodificador(decodificar,dici->inicio,dici->inicio,0,"");
+
+                        cout<<"tamanho do arquivo final: "<<decodificado.length()<<endl;
+                        ofstream out1((str+"-descompactado"+tipo).c_str(),std::fstream::trunc|std::fstream::binary);
+                            out1 << decodificado;
+                            out1.close();
+                        cout<<"Arquivo descompactado"<<endl;
+                       Sleep(1000);
+
+					} break;
+					case 2:
+					{
+						return 0;
+					} break;
+				}
+				break;
+			}
+
+
+		}}
+
+		Sleep(100);
+	}
+
+
+
+
+
+
+
   return 0;
 }
