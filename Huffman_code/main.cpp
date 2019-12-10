@@ -103,24 +103,6 @@ int quantidade(string s, char c){
     }
     return 0;
 }
-string receber_arquivo(string str){
-    ifstream caminho_arquivo(str.c_str());
-    string line,s;
-
-      if (caminho_arquivo.is_open()){
-        while (! caminho_arquivo.eof() ){
-          getline (caminho_arquivo,line);
-
-          s+=line+'\n';
-        }
-        caminho_arquivo.close();
-      }
-      else cout << "Unable to open file";
-      string t="";
-      for (int i = 0;i<s.length()-1;i++)
-        t+=s[i];
-      return t;
-}
 lno* get_no(lno* a, char c){
 if(a){
     if(a->caracter==c)
@@ -176,38 +158,21 @@ lista* receber_arquivo_bin(string str){
     ifstream caminho_arquivo(str.c_str(), std::ios::binary);
 
       if (caminho_arquivo.is_open()){
-
         char buffer;
-          while(caminho_arquivo.read((char *)&buffer,sizeof(buffer)))
-          {//cout<<buffer;
+          while(caminho_arquivo.read((char *)&buffer,sizeof(buffer))){
               sizeOfFile++;
-              if (!buscar(l,buffer)){
+              if (!buscar(l,buffer))
                 add_em_ordem(l,criar_no(buffer,"00000000",1,criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio()));
-              }else{
+              else
               get_no(l->inicio,buffer)->frequencia++;
-              }
+
             }
 
         caminho_arquivo.close();
       }
        cout << " sizeOfFile " << sizeOfFile << endl;
-        //reorganizar(l->inicio);
+
      return reorganizar(l->inicio);
-}
-lista *criar_lista_frequencia(string s){
-    lista* l=criar_vazia();
-char value[s.length()];
-    strcpy(value, s.c_str());
-for(int i =0; i<sizeof(value);i++){
-        if(!buscar(l,value[i])){
-            lno *t=criar_no(value[i],"00000000",quantidade(s,value[i]),criar_no_vazio(),criar_no_vazio(),criar_no_vazio(),criar_no_vazio());
-            //cout<<t->caracter <<"  "<<t->frequencia<<endl;
-            add_em_ordem(l,t);
-            }
-
-}
-return l;
-
 }
 void remover_primeiro(lista *a){
     if(!a->inicio->proximo)
@@ -218,14 +183,14 @@ void remover_primeiro(lista *a){
    }
 
 }
-void criar_arvore(lista *a,int i){
+void criar_arvore(lista *a){
     if(a->inicio->proximo){
 
         lno *temp=criar_no('+',"+",a->inicio->frequencia+a->inicio->proximo->frequencia,criar_no_vazio(),criar_no_vazio(),a->inicio,a->inicio->proximo);
         remover_primeiro(a);
         remover_primeiro(a);
         add_em_ordem(a,temp);
-        criar_arvore(a,++i);
+        criar_arvore(a);
     }
 }
 void mostrar_arvore(lno *a,string s){
@@ -564,14 +529,13 @@ lista *l=criar_vazia();
                         for(int i=str.length()-1;i>=0 && str[i]!='.';i--)
                             tipo=str[i]+tipo;
                         tipo='.'+tipo;
-                        //cout<<tipo<<endl;
 
                         l=receber_arquivo_bin(str);
 
 
                         string dicionario=salvar_lista(l->inicio); /// salvando lista para dicionario
 
-                        criar_arvore(l,0);
+                        criar_arvore(l);
 
                         lista *novos=criar_vazia();
                         novos_valores(l->inicio,novos,"");
@@ -593,19 +557,15 @@ lista *l=criar_vazia();
                             out << dicionario_completo+codificado;
                             out.close();
                         cout<<"Arquivo compactado"<<endl;
+                        system("pause");
 
-                       Sleep(1000);
 					} break;
 					case 1:
 					{
-						cout << "Digite camino do arquivo"<<endl;
+						cout << "Digite caminho do arquivo"<<endl;
 						string str="";// material de teste\test.exe-compactado.bin
                         getline( cin, str );
-                        string tipo="";
-                        for(int i=str.length()-1;i>=0 && str[i]!='.';i--)
-                            tipo=str[i]+tipo;
-                        tipo='.'+tipo;
-                        //cout<<tipo<<endl;
+
 						string codificado=receber_arquivo_t(str);
 						int aux=0;
                         for(int i=str.length()-1;i>=0 && str[i]!='-';i--)
@@ -616,9 +576,15 @@ lista *l=criar_vazia();
                             aux1+=str[i];
                         str=aux1;
                         cout<<str<<endl;
+                        string tipo="";
+                        for(int i=str.length()-1;i>=0 && str[i]!='.';i--)
+                            tipo=str[i]+tipo;
+                        tipo='.'+tipo;
+
+
                         lista * dici= ler_dicionario(codificado);
 
-                        criar_arvore(dici,0);
+                        criar_arvore(dici);
 
                         string decodificar=ler_arquivo(codificado);
                         cout<<"tamanho do binario final: "<<decodificar.length()<<endl;
@@ -630,7 +596,7 @@ lista *l=criar_vazia();
                             out1 << decodificado;
                             out1.close();
                         cout<<"Arquivo descompactado"<<endl;
-                       Sleep(1000);
+                       system("pause");
 
 					} break;
 					case 2:
@@ -646,12 +612,6 @@ lista *l=criar_vazia();
 
 		Sleep(100);
 	}
-
-
-
-
-
-
 
   return 0;
 }
